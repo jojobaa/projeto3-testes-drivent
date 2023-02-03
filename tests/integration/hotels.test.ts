@@ -112,7 +112,7 @@ describe("GET /hotels", () => {
 
             const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-            expect(response.status).toEqual(httpStatus.PAYMENT_REQUIRED);
+            expect(response.status).toEqual(httpStatus.NOT_FOUND);
         });
     });
 });
@@ -168,7 +168,7 @@ describe("GET /hotels/:hotelId", () => {
             const response = await server.get(`/hotels/${createHotel.id}`).set("Authorization", `Bearer ${token}`);
 
             expect(response.status).toEqual(httpStatus.OK);
-            expect(response.body).toEqual([
+            expect(response.body).toEqual(
                 {
                     id: createHotel.id,
                     name: createHotel.name,
@@ -184,8 +184,8 @@ describe("GET /hotels/:hotelId", () => {
                         updatedAt: createRoom.updatedAt.toISOString()
                     }]
                 }
-            ]);
-        });
+            );
+        });    
         it("should respond with status 200 and a list of hotels with no rooms", async () => {
             const user = await createUser();
             const token = await generateValidToken(user);
@@ -204,7 +204,7 @@ describe("GET /hotels/:hotelId", () => {
             const response = await server.get(`/hotels/${createHotel.id}`).set("Authorization", `Bearer ${token}`);
 
             expect(response.status).toEqual(httpStatus.OK);
-            expect(response.body).toEqual([
+            expect(response.body).toEqual(
                 {
                     id: createHotel.id,
                     name: createHotel.name,
@@ -213,20 +213,7 @@ describe("GET /hotels/:hotelId", () => {
                     updatedAt: createHotel.updatedAt.toISOString(),
                     Rooms: []
                 }
-            ]);
-        });
-        it("should respond with status 200 and an empty list ", async () => {
-            const user = await createUser();
-            const token = await generateValidToken(user);
-            const enrollment = await createEnrollmentWithAddress(user);
-            const ticketType = await createTicketTypeWithHotel();
-            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
-            const payment = await createPayment(ticket.id, ticketType.price);
-
-            const response = await server.get("/hotels/1").set("Authorization", `Bearer ${token}`);
-
-            expect(response.status).toEqual(httpStatus.OK);
-            expect(response.body).toEqual([]);
+            );
         });
         it("should respond with status 402 when user ticket is remote", async () => {
             const user = await createUser();
@@ -247,7 +234,27 @@ describe("GET /hotels/:hotelId", () => {
 
             const response = await server.get("/hotels/1").set("Authorization", `Bearer ${token}`);
 
-            expect(response.status).toEqual(httpStatus.PAYMENT_REQUIRED);
+            expect(response.status).toEqual(httpStatus.NOT_FOUND);
+        });
+        it("should respond with status 404 hotel id not valid", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const payment = await createPayment(ticket.id, ticketType.price);
+
+            const createHotel = await prisma.hotel.create({
+                data: {
+                    name: "Joy Hotel",
+                    image: "https://hduhe.jpg"
+                }
+            });
+    
+            const response = await server.get(`/hotels/100`).set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toEqual(httpStatus.NOT_FOUND);
+        
         });
     });
 });

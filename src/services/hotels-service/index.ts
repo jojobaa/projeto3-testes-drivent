@@ -6,12 +6,12 @@ import { cannotListHotelsError } from "@/errors/cannot-hotels-error";
 
 async function getHotels(userId: number) {
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-    if(!enrollment){
+    if (!enrollment) {
         throw notFoundError();
     }
 
     const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
-    if(!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel){
+    if (!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
         throw cannotListHotelsError();
     }
 
@@ -21,17 +21,20 @@ async function getHotels(userId: number) {
 
 async function getHotelsRooms(userId: number, hotelId: number) {
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-    if(!enrollment){
+    if (!enrollment) {
         throw notFoundError();
     }
 
     const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
-    if(!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel){
+    if (!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
         throw cannotListHotelsError();
     }
 
-    const hotels = await hotelRepository.findRoomsById(hotelId);
-    return hotels;
+    const hotel = await hotelRepository.findRoomsById(hotelId);
+    if (!hotel) {
+        throw notFoundError();
+    }
+    return hotel;
 }
 
 const hotelService = {
