@@ -19,10 +19,24 @@ async function getHotels(userId: number) {
     return hotels;
 }
 
+async function getHotelsRooms(userId: number, hotelId: number) {
+    const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+    if(!enrollment){
+        throw notFoundError();
+    }
+
+    const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
+    if(!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel){
+        throw cannotListHotelsError();
+    }
+
+    const hotels = await hotelRepository.findRoomsById(hotelId);
+    return hotels;
+}
+
 const hotelService = {
-    getHotels
+    getHotels,
+    getHotelsRooms
 };
 
 export default hotelService;
-
-//
