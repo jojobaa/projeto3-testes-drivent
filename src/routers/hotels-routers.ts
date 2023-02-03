@@ -9,3 +9,5 @@ hotelsRouter
   .get("/", getHotels )
 
 export { hotelsRouter };
+
+//

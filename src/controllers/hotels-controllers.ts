@@ -7,3 +7,5 @@ export async function getHotels(req: AuthenticatedRequest, res: Response) {
   const hotels = await hotelService.getHotels();
   return res.status(httpStatus.OK).send(hotels);
 }
+
+//
