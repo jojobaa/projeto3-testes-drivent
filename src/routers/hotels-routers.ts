@@ -11,4 +11,3 @@ hotelsRouter
 
 export { hotelsRouter };
 
-//
