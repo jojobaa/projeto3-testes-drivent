@@ -13,7 +13,8 @@ import {
     createPayment,
     generateCreditCardData,
     createTicketTypeWithHotel,
-    createTicketTypeIsRemote
+    createTicketTypeIsRemote,
+    createdHotel
 } from "../factories";
 import { cleanDb, generateValidToken } from "../helpers";
 
@@ -60,12 +61,7 @@ describe("GET /hotels", () => {
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
 
-            const createHotel = await prisma.hotel.create({
-                data: {
-                    name: "Joy Hotel",
-                    image: "https://hduhe.jpg"
-                }
-            });
+            const createHotel = await createdHotel();
 
             const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
@@ -150,12 +146,7 @@ describe("GET /hotels/:hotelId", () => {
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
 
-            const createHotel = await prisma.hotel.create({
-                data: {
-                    name: "Joy Hotel",
-                    image: "https://hduhe.jpg"
-                }
-            });
+            const createHotel = await createdHotel();
             const createRoom = await prisma.room.create({
                 data: {
                     name: "10 20",
@@ -194,12 +185,7 @@ describe("GET /hotels/:hotelId", () => {
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
 
-            const createHotel = await prisma.hotel.create({
-                data: {
-                    name: "Joy Hotel",
-                    image: "https://hduhe.jpg"
-                }
-            });
+            const createHotel = await createdHotel();
 
             const response = await server.get(`/hotels/${createHotel.id}`).set("Authorization", `Bearer ${token}`);
 
@@ -244,12 +230,7 @@ describe("GET /hotels/:hotelId", () => {
             const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
 
-            const createHotel = await prisma.hotel.create({
-                data: {
-                    name: "Joy Hotel",
-                    image: "https://hduhe.jpg"
-                }
-            });
+            const createHotel = await createdHotel();
     
             const response = await server.get(`/hotels/100`).set("Authorization", `Bearer ${token}`);
 
