@@ -4,8 +4,17 @@ import { Response } from "express";
 import httpStatus from "http-status";
 
 export async function getHotels(req: AuthenticatedRequest, res: Response) {
-  const hotels = await hotelService.getHotels();
-  return res.status(httpStatus.OK).send(hotels);
+  const {userId} = req;
+
+  try {
+    const hotels = await hotelService.getHotels(Number(userId));
+    return res.status(httpStatus.OK).send(hotels);
+  } catch (error) {
+    if(error.name === "NotFound"){
+      return res.sendStatus(httpStatus.NOT_FOUND)
+    }
+    return res.sendStatus(httpStatus.PAYMENT_REQUIRED)
+  }
 }
 
 //

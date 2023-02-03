@@ -12,6 +12,7 @@ import {
     createTicket,
     createPayment,
     generateCreditCardData,
+    createTicketTypeWithHotel
 } from "../factories";
 import { cleanDb, generateValidToken } from "../helpers";
 
@@ -54,16 +55,16 @@ describe("GET /hotels", () => {
             const user = await createUser();
             const token = await generateValidToken(user);
             const enrollment = await createEnrollmentWithAddress(user);
-            const ticketType = await createTicketType();
-            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
             const payment = await createPayment(ticket.id, ticketType.price);
 
-           const createHotel = await prisma.hotel.create({
-                data:{
-                    name:"Joy Hotel",
-                    image:"https://hduhe.jpg"
+            const createHotel = await prisma.hotel.create({
+                data: {
+                    name: "Joy Hotel",
+                    image: "https://hduhe.jpg"
                 }
-          });
+            });
 
             const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
@@ -78,7 +79,19 @@ describe("GET /hotels", () => {
                 }
             ]);
         });
+        it("should respond with status 200 and an empty list ", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const payment = await createPayment(ticket.id, ticketType.price);
+    
+            const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+    
+            expect(response.status).toEqual(httpStatus.OK);
+            expect(response.body).toEqual([]);
+        });
     });
 });
-
 //
